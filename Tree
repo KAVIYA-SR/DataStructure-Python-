@@ -1,0 +1,232 @@
+    import java.util.*;
+
+    public class BinarySearchTree {
+        Node root;
+
+        public class Node {
+            int data;
+            Node left, right;
+
+            public Node(int val) {
+                data = val;
+                left = null;
+                right = null;
+            }
+        }
+
+        public void insert(int val) {
+            root = insertNode(root, val);
+        }
+
+        public Node insertNode(Node root, int val) {
+            if (root == null)
+                return new Node(val);
+            if (val < root.data)
+                root.left = insertNode(root.left, val);
+            else
+                root.right = insertNode(root.right, val);
+            return root;
+        }
+
+
+        boolean isFullTree(Node node)
+        {
+            if(node == null)
+                return true;
+            if(node.left == null && node.right == null )
+                return true;
+            if((node.left!=null) && (node.right!=null))
+                return (isFullTree(node.left) && isFullTree(node.right));
+            return false;
+        }
+        public  boolean isCompleteBST(Node root,int ind,int tot) {
+            if (root == null) {
+                return true;
+            }
+
+            if(ind>=tot)
+                return false;
+            return (isCompleteBST(root.left,2*ind+1,tot))&&isCompleteBST(root.right,2*ind+2,tot);
+
+//
+        }
+        public boolean balanced(Node temp){
+            if (temp==null)
+            return true;
+                int l=height(temp.left);
+                int r=height(temp.right);
+            if(Math.abs(l-r)<=1 && balanced(temp.left) && balanced(temp.right))
+                return true;
+            return false;
+        }
+        public int height(Node temp){
+            if(temp==null)
+                return 0;
+            return Math.max(height(temp.left),height(temp.right))+1;
+        }
+        public BinarySearchTree() {
+            root = null;
+        }
+
+        public void inOrder(Node root) {
+            if (root == null) {
+                return;
+            }
+
+                System.out.print(root.data + " ");
+                inOrder(root.left);
+                inOrder(root.right);
+
+        }
+        public Node lowestAncestor(Node root,int n1,int n2){
+            if(root==null)
+                return null;
+            int d=root.data;
+            if(d>n1 && d>n2)
+                return lowestAncestor(root.left,n1,n2);
+            if(d<n1 && d<n2)
+                return lowestAncestor(root.right,n1,n2);
+            return root;
+        }
+        public void levelOrderTraversal() {
+            if (root == null)
+                return;
+
+            Queue<Node> queue = new LinkedList<>();
+            Queue<Integer> queue1 = new LinkedList<>();
+            TreeMap<Integer,Set<Integer>> top=new TreeMap<>();
+            queue.add(root);
+            queue1.add(0);
+            int d=0;
+            String res="";
+            int lev=0;
+            while (!queue.isEmpty()) {
+                int levelSize = queue.size();
+                String s="";
+                for (int i = 0; i < levelSize; i++) {
+                    Node node = queue.poll();
+                    int x=queue1.poll();
+                    if(!top.containsKey(x)){
+                        TreeSet<Integer> l=new TreeSet<>();
+
+                        top.put(x,l);
+//                        top.get(x).add(node.data,lev);
+                    }
+                    top.get(x).add(node.data);
+
+                    if (node.left != null){
+                        queue.add(node.left);
+                        queue1.add(x-1);
+                    }
+                    if (node.right != null){
+                        queue.add(node.right);
+                        queue1.add(x+1);
+                    }
+                }
+                lev++;
+
+//                String h[]=s.split(" ");
+//
+//                res+=h[h.length-1]+" ";
+            }
+//            System.out.println(top);
+            for(Set<Integer> x:top.values())
+            {
+                for(int x1:x){
+                    System.out.print(x1+" ");
+                }
+                System.out.println();
+            }
+        }
+
+        public int search(Node root, int val) {
+            int c=0;
+            if (root.data == val)
+                return c;
+            if (val < root.data)
+                return search(root.left, val)+1;
+            else
+                return search(root.right, val)+1;
+        }
+
+        public Node delete(Node root, int val) {
+            if (root == null)
+                return root;
+            if (val < root.data)
+                root.left = delete(root.left, val);
+            else if (val > root.data)
+                root.right = delete(root.right, val);
+            else {
+                if (root.left == null)
+                    return root.right;
+                else if (root.right == null)
+                    return root.left;
+                root.data = min(root.right);
+                root.right = delete(root.right, root.data);
+            }
+            return root;
+        }
+
+        public int min(Node temp) {
+            int min = temp.data;
+            while (temp.left != null) {
+                min = temp.left.data;
+                temp = temp.left;
+            }
+            return min;
+        }
+        int countBSTs(Node root) {
+            if (root == null)
+                return 0;
+
+            int count = 0;
+            if (isBST(root))
+                count++;
+
+            count += countBSTs(root.left);
+            count += countBSTs(root.right);
+
+            return count;
+        }
+
+        boolean isBST(Node node) {
+            return isBSTUtil(node, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        }
+
+        boolean isBSTUtil(Node node, int min, int max) {
+            if (node == null)
+                return true;
+
+            if (node.data < min || node.data > max)
+                return false;
+
+            return isBSTUtil(node.left, min, node.data - 1) && isBSTUtil(node.right, node.data + 1, max);
+        }
+        public static void main(String[] args) {
+            Scanner sc = new Scanner(System.in);
+            int t = sc.nextInt();
+
+
+            for (int j = 0; j < t; j++) {
+
+                int n = sc.nextInt();
+                BinarySearchTree b1 = new BinarySearchTree();
+                int c=0;
+                for (int i = 0; i < n; i++) {
+                    int left=2*i+1;
+                    int rigtht=2*i+2;
+                    if(left<n && rigtht<n)
+                        c++;
+                    if(left<n || rigtht<n)
+                        c++;
+                }
+
+
+                    System.out.println(c);
+
+            }
+        }
+    }
+//3 10 20 18
+//        12 3 10 20
+//        4 6 3 10 20
